@@ -77,6 +77,35 @@ catalogRouter.get('/cars', async (req, res) => {
   });
 });
 
+// ---------- Staff profiles (customers choose a preferred captain) ----------
+
+catalogRouter.get('/staff', requireAuth, async (req, res) => {
+  const q = parse(z.object({ kind: z.enum(['driver', 'guard', 'gunman']) }), req.query);
+  const companies = await CompanyModel.find({ status: 'approved' }).select('_id legalName tradingName').lean();
+  const byId = new Map(companies.map((c) => [String(c._id), c.tradingName || c.legalName]));
+  const staff = await UserModel.find({
+    staffKind: q.kind,
+    status: 'active',
+    available: true,
+    company: { $in: [...byId.keys()] },
+  })
+    .select('name staffKind avatarUrl company createdAt')
+    .sort({ name: 1 })
+    .limit(50)
+    .lean();
+  // Public profile only: no phone numbers or documents.
+  res.json({
+    staff: staff.map((s) => ({
+      id: String(s._id),
+      name: s.name,
+      staffKind: s.staffKind,
+      avatarUrl: s.avatarUrl,
+      companyName: byId.get(String(s.company)),
+      verified: true,
+    })),
+  });
+});
+
 // ---------- Uploads (evidence photos, avatars) ----------
 
 catalogRouter.post('/uploads', requireAuth, singleFile, async (req, res) => {
