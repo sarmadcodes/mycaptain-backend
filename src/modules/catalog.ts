@@ -54,7 +54,7 @@ catalogRouter.put(
     const rates = await RateCardModel.findOneAndUpdate(
       { key: 'default' },
       { $set: { ...req.body, updatedBy: new Types.ObjectId(me(req).id) } },
-      { upsert: true, new: true, runValidators: true },
+      { upsert: true, returnDocument: 'after', runValidators: true },
     );
     emit('rates:updated', rates.toJSON(), { admins: true });
     res.json({ rates });

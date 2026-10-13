@@ -39,7 +39,7 @@ const counterSchema = new Schema({ _id: String, seq: { type: Number, default: 0 
 const Counter = model('Counter', counterSchema);
 
 export async function nextRef(name: 'booking' | 'company', prefix: string, start: number) {
-  const c = (await Counter.findOneAndUpdate({ _id: name }, { $inc: { seq: 1 } }, { upsert: true, new: true })) as HydratedDocument<{
+  const c = (await Counter.findOneAndUpdate({ _id: name }, { $inc: { seq: 1 } }, { upsert: true, returnDocument: 'after' })) as HydratedDocument<{
     seq: number;
   }>;
   return `${prefix}-${start + c.seq}`;

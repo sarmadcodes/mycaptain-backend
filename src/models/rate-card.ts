@@ -52,7 +52,7 @@ export async function currentRates() {
   const created = await RateCardModel.findOneAndUpdate(
     { key: 'default' },
     { $setOnInsert: { key: 'default', ...DEFAULT_RATES } },
-    { upsert: true, new: true, lean: true },
+    { upsert: true, returnDocument: 'after', lean: true },
   );
   return created!;
 }

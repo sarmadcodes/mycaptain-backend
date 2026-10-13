@@ -115,7 +115,7 @@ authRouter.patch(
   requireAuth,
   body(z.object({ name: z.string().trim().min(2).max(80).optional(), email: z.email().max(120).optional() })),
   async (req, res) => {
-    const user = await UserModel.findByIdAndUpdate(me(req).id, { $set: req.body }, { new: true, runValidators: true });
+    const user = await UserModel.findByIdAndUpdate(me(req).id, { $set: req.body }, { returnDocument: 'after', runValidators: true });
     if (!user) throw notFound('Account');
     res.json({ user });
   },

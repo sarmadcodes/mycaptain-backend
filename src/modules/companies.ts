@@ -221,7 +221,7 @@ companiesRouter.post('/me/cars', ...partner, body(carSchema), async (req, res) =
 
 companiesRouter.patch('/me/cars/:id', ...partner, body(carSchema.partial()), async (req, res) => {
   const { id } = parse(z.object({ id: objectId }), req.params);
-  const car = await RentalCarModel.findOneAndUpdate({ _id: id, company: me(req).company }, { $set: req.body }, { new: true, runValidators: true });
+  const car = await RentalCarModel.findOneAndUpdate({ _id: id, company: me(req).company }, { $set: req.body }, { returnDocument: 'after', runValidators: true });
   if (!car) throw notFound('Car');
   res.json({ car });
 });
